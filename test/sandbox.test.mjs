@@ -24,12 +24,20 @@ test("sandbox copies a restricted snapshot and refuses unapproved commands", () 
   delete process.env.TATWO_BETA_STATE_DIR;
 });
 
-test("sandbox rejects source symlinks", () => {
+test("sandbox rejects source symlinks", t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "tatwo-beta-symlink-"));
   const source = path.join(root, "source");
   fs.mkdirSync(source);
   fs.writeFileSync(path.join(root, "outside.txt"), "outside");
-  fs.symlinkSync(path.join(root, "outside.txt"), path.join(source, "escape"));
+  try {
+    fs.symlinkSync(path.join(root, "outside.txt"), path.join(source, "escape"));
+  } catch (error) {
+    if (error.code === "EPERM") {
+      t.skip("platform does not permit symlink creation in this environment");
+      return;
+    }
+    throw error;
+  }
   process.env.TATWO_BETA_STATE_DIR = path.join(root, "state");
   const sandbox = new Sandbox(new StateStore(process.env.TATWO_BETA_STATE_DIR));
   assert.throws(() => sandbox.begin({ contractID: "contract_test", source }), /symlink_rejected/);
