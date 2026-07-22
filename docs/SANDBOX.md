@@ -11,6 +11,8 @@ The public beta uses Docker as an optional execution boundary.
 - no added Linux capabilities;
 - no privilege escalation;
 - read-only container root;
+- host-matching non-root UID/GID where the platform exposes them;
+- isolated writable tmpfs paths for `/tmp` and `HOME` only;
 - no automatic runtime installation, startup, or image pull;
 - only allowlisted commands;
 - source symlinks are rejected;

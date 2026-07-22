@@ -46,6 +46,13 @@ function allowedCommand(command, activePolicy) {
   return activePolicy.allowedCommands.includes(normalized);
 }
 
+function dockerIdentityArgs() {
+  const uid = typeof process.getuid === "function" ? process.getuid() : null;
+  const gid = typeof process.getgid === "function" ? process.getgid() : null;
+  if (!Number.isInteger(uid) || !Number.isInteger(gid)) return [];
+  return ["--user", `${uid}:${gid}`];
+}
+
 function copySafeTree(source, destination, activePolicy) {
   const rootReal = fs.realpathSync(source);
   const excluded = new Set(activePolicy.excludedNames);
@@ -146,7 +153,11 @@ export class Sandbox {
       "run", "--rm", "--pull=never", "--network=none",
       "--pids-limit", "128", "--memory", "1g", "--cpus", "2",
       "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges",
-      "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m",
+      ...dockerIdentityArgs(),
+      "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m,mode=1777",
+      "--tmpfs", "/home/tatwo:rw,noexec,nosuid,size=64m,mode=1777",
+      "--env", "HOME=/home/tatwo",
+      "--env", "npm_config_cache=/tmp/npm-cache",
       "--volume", `${sandbox.workspace}:/workspace:rw`,
       "--workdir", "/workspace",
       activePolicy.image, "sh", "-lc", command

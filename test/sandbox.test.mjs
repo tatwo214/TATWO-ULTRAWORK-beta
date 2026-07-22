@@ -63,7 +63,7 @@ test("sandbox executes in Docker without writing back to the source", {
   const sandbox = new Sandbox(new StateStore(process.env.TATWO_BETA_STATE_DIR));
   const begun = sandbox.begin({ contractID: "contract_test", source });
   const receipt = sandbox.run({ sandboxID: begun.sandboxID, command: "npm test" });
-  assert.equal(receipt.status, "passed");
+  assert.equal(receipt.status, "passed", JSON.stringify(receipt, null, 2));
   assert.equal(fs.existsSync(path.join(source, "sandbox-artifact.txt")), false);
   delete process.env.TATWO_BETA_STATE_DIR;
 });
