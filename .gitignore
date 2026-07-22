@@ -1,0 +1,15 @@
+node_modules/
+.tatwo-ultrawork-beta/
+coverage/
+dist/
+*.log
+.DS_Store
+._*
+.__*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.mobileprovision

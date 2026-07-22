@@ -1,0 +1,49 @@
+{
+  "name": "@tatwo/ultrawork-beta",
+  "version": "0.1.0-beta.1",
+  "description": "Public, local-first multi-model collaboration OS, gateway, MCP server, and restricted sandbox.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "tatwo-ultrawork-beta": "./bin/tatwo-ultrawork-beta.mjs",
+    "tatwo-ultrawork-beta-mcp": "./bin/tatwo-ultrawork-beta-mcp.mjs"
+  },
+  "files": [
+    "AGENTS.md",
+    "bin",
+    "CLAUDE.md",
+    "config",
+    "CONTRIBUTING.md",
+    "docs",
+    "schemas",
+    "skills",
+    "src",
+    "LICENSE",
+    "NOTICE",
+    "OS.md",
+    "README.md",
+    "README.en.md",
+    "SECURITY.md",
+    "PRIVACY.md"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "doctor": "node ./bin/tatwo-ultrawork-beta.mjs doctor --json",
+    "setup:dry": "node ./bin/tatwo-ultrawork-beta.mjs setup --dry-run --json",
+    "scan:public": "node ./scripts/public-safety-scan.mjs",
+    "verify": "npm test && npm run setup:dry && npm run scan:public"
+  },
+  "keywords": [
+    "multi-agent",
+    "multi-model",
+    "mcp",
+    "ai-orchestration",
+    "sandbox",
+    "codex",
+    "claude",
+    "grok"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "AdapterRegistryV1",
+  "adapters": [
+    {
+      "id": "codex",
+      "type": "command",
+      "command": "codex",
+      "args": ["exec", "--skip-git-repo-check", "-"],
+      "promptTransport": "stdin",
+      "inheritHome": true,
+      "enabled": false
+    },
+    {
+      "id": "claude",
+      "type": "command",
+      "command": "claude",
+      "args": ["-p", "{prompt}"],
+      "promptTransport": "argument",
+      "inheritHome": true,
+      "enabled": false
+    },
+    {
+      "id": "grok",
+      "type": "command",
+      "command": "grok",
+      "args": ["-p", "{prompt}"],
+      "promptTransport": "argument",
+      "inheritHome": true,
+      "enabled": false
+    },
+    {
+      "id": "openai-compatible",
+      "type": "http",
+      "baseURL": "http://127.0.0.1:8080/v1",
+      "apiKeyEnv": "TATWO_PROVIDER_API_KEY",
+      "enabled": false
+    }
+  ]
+}
