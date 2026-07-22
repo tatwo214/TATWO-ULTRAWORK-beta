@@ -68,7 +68,7 @@ export class MCPServer {
           result: {
             protocolVersion: request.params?.protocolVersion || "2024-11-05",
             capabilities: { tools: {} },
-            serverInfo: { name: "tatwo-ultrawork-beta", version: "0.1.0-beta.1" }
+            serverInfo: { name: "tatwo-ultrawork-beta", version: "0.1.0-beta.2" }
           }
         });
       } else if (request.method === "ping") {

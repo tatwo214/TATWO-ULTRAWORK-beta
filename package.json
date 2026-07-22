@@ -1,6 +1,6 @@
 {
-  "name": "@tatwo/ultrawork-beta",
-  "version": "0.1.0-beta.1",
+  "name": "tatwo-ultrawork-beta",
+  "version": "0.1.0-beta.2",
   "description": "Public, local-first multi-model collaboration OS, gateway, MCP server, and restricted sandbox.",
   "type": "module",
   "license": "Apache-2.0",

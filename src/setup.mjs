@@ -6,7 +6,7 @@ import { ensureDir, now, safeJSON, stateRoot } from "./core/util.mjs";
 import { runSmoke } from "./smoke.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const version = "0.1.0-beta.1";
+const version = "0.1.0-beta.2";
 
 function copyRuntime(source, destination) {
   fs.cpSync(source, destination, {

@@ -63,7 +63,7 @@ gateway text calls, and dry-run remain available.
 Install from the pinned beta tag:
 
 ```bash
-npx --yes github:tatwo214/TATWO-ULTRAWORK-beta#v0.1.0-beta.1 setup
+npx --yes github:tatwo214/TATWO-ULTRAWORK-beta#v0.1.0-beta.2 setup
 ```
 
 Verify:

@@ -60,7 +60,7 @@ Gateway text call 與 dry-run。
 從固定 beta tag 安裝：
 
 ```bash
-npx --yes github:tatwo214/TATWO-ULTRAWORK-beta#v0.1.0-beta.1 setup
+npx --yes github:tatwo214/TATWO-ULTRAWORK-beta#v0.1.0-beta.2 setup
 ```
 
 確認：

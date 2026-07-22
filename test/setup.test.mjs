@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import test from "node:test";
 import { setup } from "../src/setup.mjs";
 
@@ -9,4 +10,10 @@ test("setup dry-run is non-mutating and host configuration is opt-in", () => {
   assert.ok(receipt.actions.some(action => action.action === "install_public_skill"));
   assert.ok(!receipt.actions.some(action => action.action === "configured"));
   assert.equal(receipt.postInstallSmoke.status, "not_run_in_dry_run");
+});
+
+test("package name selects the setup CLI unambiguously through npx", () => {
+  const packageDocument = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  assert.equal(packageDocument.name, "tatwo-ultrawork-beta");
+  assert.equal(packageDocument.bin[packageDocument.name], "./bin/tatwo-ultrawork-beta.mjs");
 });
