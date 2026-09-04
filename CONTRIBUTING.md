@@ -1,24 +1,5 @@
 # Contributing
 
-1. Read `OS.md`.
-2. Define the Goal criteria and protected surfaces.
-3. Keep changes provider-neutral and independent of any graphical application.
-4. Add tests for contract gates, adapter behavior, or sandbox boundaries.
-5. Run:
+Keep changes portable, dependency-light, and fail-closed. Do not submit logs, screenshots, receipts, real model output, local paths, account identifiers, credentials, or private fixtures.
 
-```bash
-npm run verify
-```
-
-6. Confirm the public safety scan has zero findings.
-
-Do not submit real credentials, private paths, machine state, proprietary
-receipts, vendor sessions, or private-project fixtures.
-
-New adapters must:
-
-- use explicit configuration;
-- avoid provider credential discovery;
-- inherit only the minimum environment;
-- redact errors and receipts;
-- remain subordinate to the active OS contract.
+Before proposing a change, run `npm run check`. Host mutation, network listeners, provider authentication, install hooks, and background services are out of scope for the public core and require a separate design review.

@@ -1,39 +1,25 @@
 # Architecture
 
-```text
-AI client or CLI
-      │
-      ▼
-TATWO public Skill and OS constitution
-      │
-      ▼
-Goal / Context / Plan / Loops contract store
-      │
-      ├── provider-neutral Gateway adapters
-      ├── stdio MCP server
-      └── restricted Docker sandbox
-              │
-              ▼
-        receipts and Goal Judge
-```
+## Public reference layers
 
-The OS owns governance. Adapters own transport. Provider authentication remains
-outside TATWO. The sandbox owns the execution boundary. Receipts carry evidence
-between identities and engines.
+1. **Thread layer** — a discussion owns the goal, plan, messages, engine binding, and evidence references.
+2. **Sidecar boundary** — each engine adapter exchanges newline-delimited JSON over standard input/output. The public protocol normalizes lifecycle and permission events but contains no vendor login logic.
+3. **Room layer** — the lead prepares bounded room briefs. A real host may map rooms to isolated worktrees, but this package only validates and previews them.
+4. **Monitor layer** — liveness, pressure, and scope-drift signals are observations, never proof of completion.
+5. **Verification layer** — the lead compares outputs with the original goal and reruns applicable checks. A reviewer is advisory and must not self-approve.
 
-State is local JSON under the TATWO beta state directory. Set
-`TATWO_BETA_STATE_DIR` to select a different isolated state root.
+## Event protocol
 
-## Hash binding
+App to adapter operations: `send`, `permission`, `interrupt`, `model`, `status`, `close`.
 
-- Goal content produces `goalHash`.
-- Context evidence produces `contextHash`.
-- Plan content produces `planHash`.
-- Loop tasks carry `goalHash + planHash`.
-- A new Goal revision stales the prior Plan and Loops.
+Adapter to app events: `init`, `text_delta`, `tool_use`, `tool_result`, `permission_request`, `result`, `stderr`, `error`, `closed`.
 
-## Public boundary
+Every message is one JSON object on one line. Unknown operations and extra fields are rejected. Permission defaults to denied. The public core never launches an adapter.
 
-There is no graphical application code, device service, update service, remote
-control endpoint, hosted gateway, or provider credential store in this
-repository.
+## What integrators must provide
+
+A production host must separately implement process supervision, engine authentication, secure storage, permission UI, workspace creation, resource limits, and teardown. Those capabilities are intentionally absent here.
+
+## Path note
+
+`lexicalWorkingRoot` is a lexical preview only. Before any real read or write, a host integration must resolve existing ancestors with operating-system `realpath`, reject unsafe symlinks, and re-check containment under the allowed root.

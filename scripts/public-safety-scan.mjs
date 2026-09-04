@@ -1,49 +1,51 @@
 #!/usr/bin/env node
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const excluded = new Set([".git", "node_modules", "coverage", "dist"]);
-const files = [];
-
-function walk(directory) {
-  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    if (excluded.has(entry.name)) continue;
-    const target = path.join(directory, entry.name);
-    if (entry.isDirectory()) walk(target);
-    else if (entry.isFile()) files.push(target);
-  }
-}
-
-walk(root);
-
+const root = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const skip = new Set(['.git', 'node_modules', 'coverage']);
+const textExtensions = new Set(['', '.md', '.mjs', '.js', '.json', '.yaml', '.yml', '.txt', '.gitignore']);
 const forbidden = [
-  { label: "macOS user path", pattern: new RegExp(`/${"Users"}/`) },
-  { label: "mounted volume path", pattern: new RegExp(`/${"Volumes"}/`) },
-  { label: "Windows user path", pattern: /[A-Z]:\\Users\\/i },
-  { label: "private email", pattern: /[A-Z0-9._%+-]+@(?!users\.noreply\.github\.com)[A-Z0-9.-]+\.[A-Z]{2,}/i },
-  { label: "private key", pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/ },
-  { label: "access token", pattern: /\b(?:gh[opsu]_|sk-)[A-Za-z0-9_-]{16,}/ },
-  { label: "private OS repository", pattern: new RegExp(["TATWO", "ULTRAWORKos"].join("-")) },
-  { label: "application source", pattern: new RegExp(`\\b(?:${["Swift", "UI"].join("")}|${["Launch", "Agent"].join("")}|${["Spark", "le"].join("")}|${["Bundle", "ID"].join(" ")})\\b`, "i") },
-  { label: "private model route", pattern: new RegExp(`\\b(?:${["fable", "5"].join("-")}|${["sonnet", "5"].join("-")}|${["gpt", "5.5"].join("-").replace(".", "\\.")})\\b`, "i") }
+  ['/Users path', /\/Users\//],
+  ['/Volumes path', /\/Volumes\//],
+  ['/home path', /\/home\/[A-Za-z0-9._-]+\//],
+  ['Windows user path', /[A-Za-z]:\\Users\\/i],
+  ['private key', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/],
+  ['generic secret assignment', /\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\s*[:=]\s*["'][^"']{8,}/i],
+  ['provider token', /\b(?:sk-[A-Za-z0-9_-]{16,}|xox[baprs]-[A-Za-z0-9-]{10,}|gh[pousr]_[A-Za-z0-9]{20,})\b/],
+  ['email address', /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i],
+  ['sensitive directory', /(?:^|\/)(?:receipts|sessions|attachments|browser-profile|DerivedData)(?:\/|$)/i],
 ];
-
 const findings = [];
-for (const file of files) {
-  const relative = path.relative(root, file);
-  const buffer = fs.readFileSync(file);
-  if (buffer.includes(0)) continue;
-  const text = buffer.toString("utf8");
-  for (const rule of forbidden) {
-    if (rule.pattern.test(text)) findings.push({ file: relative, rule: rule.label });
+
+function walk(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (skip.has(entry.name)) continue;
+    const file = path.join(dir, entry.name);
+    const rel = path.relative(root, file);
+    const stat = fs.lstatSync(file);
+    if (!/^[\x20-\x7e]+$/.test(rel)) findings.push(`${rel}: non-ASCII path rejected`);
+    if (/(^|\/)(?:\.env(?:\..*)?|receipts|sessions|attachments|browser-profile|DerivedData|\.claude|\.codex)(?:\/|$)/i.test(rel)) findings.push(`${rel}: sensitive path rejected`);
+    if ((stat.mode & 0o002) !== 0) findings.push(`${rel}: world-writable file rejected`);
+    if (stat.isSymbolicLink()) { findings.push(`${rel}: symlink rejected`); continue; }
+    if (stat.isDirectory()) { walk(file); continue; }
+    if (!stat.isFile()) continue;
+    if (stat.size > 1_000_000) { findings.push(`${rel}: file exceeds 1 MB`); continue; }
+    const ext = entry.name === '.gitignore' ? '.gitignore' : path.extname(entry.name);
+    if (!textExtensions.has(ext)) { findings.push(`${rel}: non-text file rejected`); continue; }
+    const data = fs.readFileSync(file);
+    if (data.includes(0)) { findings.push(`${rel}: binary content rejected`); continue; }
+    const source = data.toString('utf8');
+    for (const [label, pattern] of forbidden) if (pattern.test(source)) findings.push(`${rel}: ${label}`);
   }
 }
-
+walk(root);
 if (findings.length) {
-  process.stderr.write(`${JSON.stringify({ ok: false, findings }, null, 2)}\n`);
+  process.stderr.write(`PUBLIC SAFETY SCAN FAIL\n${findings.map(item => `- ${item}`).join('\n')}\n`);
   process.exit(1);
 }
-
-process.stdout.write(`${JSON.stringify({ ok: true, filesScanned: files.length, findings: 0 }, null, 2)}\n`);
+process.stdout.write('PUBLIC SAFETY SCAN PASS\n');
