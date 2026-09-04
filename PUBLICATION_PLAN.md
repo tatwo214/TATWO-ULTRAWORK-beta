@@ -15,6 +15,6 @@ The existing public 1.0 tree is Apache-2.0. Its release tags, notices, contribut
 - [x] Node 20 test and CLI smoke.
 - [x] Threat model and restricted CI permissions review.
 - [x] Existing 1.0 history preserved without force push.
-- [ ] Remote tree and downloadable archive inspected after upload.
+- [x] Remote tree and downloadable archive inspected after upload.
 
 `package.json` intentionally keeps `private: true` to block accidental npm publication; the planned release surface is a source repository.
