@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "dryRun": true,
+  "allowedRoot": "/tmp/tatwo-public-demo",
+  "rooms": [
+    {
+      "id": "docs-review",
+      "title": "Review portable documentation",
+      "engine": "other",
+      "brief": "Read the public documents and list ambiguous security boundaries. Do not modify files.",
+      "workingRoot": "rooms/docs-review",
+      "acceptance": ["Return findings with file names", "Do not claim tests were run"]
+    }
+  ]
+}
